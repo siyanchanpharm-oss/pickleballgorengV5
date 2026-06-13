@@ -15,6 +15,7 @@
         
         header { background: var(--primary); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; height: 65px; }
         .base-indicator { background: var(--secondary); padding: 5px 12px; border-radius: 15px; font-size: 0.8rem; font-weight: bold; }
+        .btn-clear { background: none; border: 1px solid rgba(255,255,255,0.4); color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; cursor: pointer; }
         
         nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; border-top: 1px solid #eee; height: 75px; z-index: 1000; }
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #999; border: none; background: none; font-size: 0.7rem; cursor: pointer; }
@@ -53,7 +54,10 @@
 
 <header>
     <div><h2 id="sessionNameHeader" style="margin:0; font-size: 0.9rem;">Acez PB</h2><div id="dateLine" style="font-size: 0.7rem; opacity: 0.8;"></div></div>
-    <div id="headerBaseDisplay" class="base-indicator">RM10</div>
+    <div style="display: flex; gap: 8px; align-items: center;">
+        <button onclick="clearCacheFailsafe()" class="btn-clear">CLEAR CACHE</button>
+        <div id="headerBaseDisplay" class="base-indicator">RM10</div>
+    </div>
 </header>
 
 <div id="confirmModal" class="modal-overlay">
@@ -140,9 +144,8 @@
 </nav>
 
 <script>
-    https://script.google.com/macros/s/AKfycbwMeCUiALw27_yXy8Qtq8U_UPCuWKNLimgpHWC-Sf3vh13ahOUKuITAq_p__jjEOe-m/exec
-    const GOOGLE_SHEET_URL = "";
-    const STORAGE_KEY = 'acez_fresh_start_v99';
+    const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwMeCUiALw27_yXy8Qtq8U_UPCuWKNLimgpHWC-Sf3vh13ahOUKuITAq_p__jjEOe-m/exec";
+    const STORAGE_KEY = 'acez_cloud_final_v1';
 
     let appData = { master: ["Acez"], today: ["Acez"], base: 10, active: { name: "New Session", history: [] }, archive: [], selections: { w1: null, w2: null, l1: null, l2: null }, activeSlot: 'w1' };
 
@@ -150,11 +153,13 @@
         try {
             const saved = localStorage.getItem(STORAGE_KEY);
             if (saved) { appData = JSON.parse(saved); }
-        } catch(e) { console.log("Fresh initialization active."); }
+        } catch(e) { console.log("Fresh initialization setup."); }
         render();
     }
 
     function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); render(); }
+    function clearCacheFailsafe() { if(confirm("Clear app memory to fix freezes? Your current unsaved local view will reset.")) { localStorage.clear(); location.reload(); } }
+
     function switchTab(id, el) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); document.getElementById('view-' + id).classList.add('active'); el.classList.add('active'); window.scrollTo(0,0); }
     function handleSlotClick(s) { appData.activeSlot = s; save(); }
     
@@ -197,7 +202,7 @@
                         sessionName: appData.active.name
                     })
                 }).catch(e => console.log("Sync skipped."));
-            } catch(err) { console.log("Sync handled."); }
+            } catch(err) { console.log("Sync handled safely."); }
         }
 
         appData.active.history.push(pendingGame);
@@ -264,11 +269,10 @@
         appData.active.history.slice().reverse().forEach((g,i) => { log.innerHTML += `<div style="padding:12px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; font-size:0.85rem"><span><b>${g.w.join('/')}</b> vs ${g.l.join('/')} (${g.score})</span><i class="fas fa-trash" style="color:#ccc; cursor:pointer;" onclick="deleteGame(${appData.active.history.length-1-i})"></i></div>`; });
         
         const lb = document.querySelector('#leaderboardTable tbody'); lb.innerHTML = ''; const stats = getStats(); Object.entries(stats).sort((a,b)=>b[1].rm-a[1].rm).forEach(([n,v]) => { lb.innerHTML += `<tr><td>${n}<span class="win-badge">${v.w}W-${v.l}L</span></td><td style="text-align:right;" class="${v.rm >= 0 ? 'txt-win' : 'txt-lose'}">RM ${v.rm.toFixed(2)}</td></tr>`; });
-        const al = document.getElementById('archiveList'); al.innerHTML = ''; appData.archive.slice().reverse().forEach((s, i) => { al.innerHTML += `<div style="padding:12px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;"><span>${s.name} <small style="color:#999">${s.date}</small></span><div><button onclick="loadArchive(${appData.archive.length-1-i})" style="padding:5px 10px; background:var(--secondary); color:white; border:none; border-radius:4px; font-size:0.7rem; cursor:pointer;">LOAD</button><button onclick="deleteArchive(${appData.archive.length-1-i})" style="background:none; border:none; color:var(--danger); margin-left:10px; cursor:pointer;"><i class="fas fa-trash"></i></button></div></div>`; });
+        const al = document.getElementById('archiveList'); al.innerHTML = ''; appData.archive.slice().reverse().forEach((s, i) => { al.innerHTML += `<div style="padding:12px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;"><span>${s.name} <small style="color:#999">${s.date}</small></span><div><button onclick="loadArchive(${appData.archive.length-1-i})" style="padding:5px 10px; background:var(--secondary); color:white; border:none; border-radius:4px; font-size:0.7rem; cursor:pointer;">LOAD</button><button onclick="deleteArchive(${appData.archive.length-1-i})" style="background:none; border:none; color:var(--danger); margin-left:10px; cursor:pointer;">&times;</button></div></div>`; });
         const mc = document.getElementById('masterListCheckboxes'); mc.innerHTML = ''; appData.master.forEach(p => { mc.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee;"><span>${p}</span><div style="display:flex; align-items:center; gap:15px;"><i class="fas fa-trash-alt" style="color:#ccc; cursor:pointer;" onclick="deleteMasterPlayer('${p}')"></i><div onclick="toggleToday('${p}')" style="width:28px; height:28px; border-radius:50%; border:2px solid ${appData.today.includes(p)?'var(--success)':'#ddd'}; display:flex; align-items:center; justify-content:center; color:${appData.today.includes(p)?'var(--success)':'transparent'}; cursor:pointer;"><i class="fas fa-check"></i></div></div></div>`; });
     }
     
-    // Core Execution Initialization
     init();
 </script>
 </body>
