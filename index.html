@@ -12,27 +12,36 @@
         :root { --primary: #1a237e; --secondary: #3949ab; --danger: #dc3545; --success: #28a745; --bg: #f8f9fa; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: -apple-system, sans-serif; margin: 0; background: var(--bg); padding-bottom: 100px; touch-action: manipulation; }
+        
         header { background: var(--primary); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; height: 65px; }
         .base-indicator { background: var(--secondary); padding: 5px 12px; border-radius: 15px; font-size: 0.8rem; font-weight: bold; }
+        
         nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; border-top: 1px solid #eee; height: 75px; z-index: 1000; }
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #999; border: none; background: none; font-size: 0.7rem; cursor: pointer; }
         .nav-item.active { color: var(--primary); font-weight: bold; }
+
         .view { display: none; padding: 15px; width: 100%; }
         .view.active { display: block; }
+        
         .card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); width: 100%; }
         .header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
         .inline-score-box { border: 2px solid #2196F3; border-radius: 8px; width: 90px; height: 38px; text-align: center; font-weight: 900; color: #d32f2f; font-size: 1.3rem; background: #fff; }
+        
         .selection-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .slot { background: #f0f2f5; border: 1px dashed #cbd5e0; border-radius: 8px; padding: 12px 5px; text-align: center; font-size: 0.85rem; min-height: 45px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .slot.selected { background: #e8eaf6; border: 2px solid var(--secondary); color: var(--primary); font-weight: bold; }
+        
         .chip-container { display: flex; flex-wrap: wrap; gap: 8px; margin: 15px 0; }
         .chip { background: white; border: 1px solid #ddd; padding: 8px 15px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; }
         .chip.active { background: var(--secondary); color: white; border-color: var(--secondary); }
+
         .score-grid-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
         .score-btn { border: 1px solid #ddd; border-radius: 10px; padding: 12px 0; display: flex; flex-direction: column; align-items: center; cursor: pointer; background: white; }
+        
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 5000; align-items: center; justify-content: center; padding: 20px; }
         .modal { background: white; width: 100%; max-width: 400px; border-radius: 16px; padding: 20px; text-align: center; }
-        .btn-wa { background:#25D366; color:white; border:none; padding:15px; border-radius:8px; width:100%; font-weight:bold; display:flex; align-items:center; justify-content:center; gap:8px; margin-top:10px; text-decoration: none; font-size: 0.9rem; }
+        
+        .btn-wa { background:#25D366; color:white; border:none; padding:15px; border-radius:8px; width:100%; font-weight:bold; display:flex; align-items:center; justify-content:center; gap:8px; margin-top:10px; text-decoration: none; font-size: 0.9rem; cursor: pointer; }
         table { width: 100%; border-collapse: collapse; }
         td { padding: 12px 0; border-bottom: 1px solid #eee; font-size: 0.9rem; }
         .win-badge { background: #eee; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-left: 5px; font-weight: bold; }
@@ -52,8 +61,8 @@
         <h3 style="margin-top:0">Save Match?</h3>
         <div id="confirmDetail" style="background:#f8f9fa; padding:15px; margin-bottom:20px; border-radius:8px; text-align:left; font-size: 0.9rem; line-height: 1.4;"></div>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <button onclick="closeConfirm()" style="padding:15px; border:none; border-radius:8px; background:#eee; font-weight:bold;">Cancel</button>
-            <button id="confirmCommitBtn" onclick="commitGame()" style="background:var(--success); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold;">Confirm</button>
+            <button onclick="closeConfirm()" style="padding:15px; border:none; border-radius:8px; background:#eee; font-weight:bold; cursor:pointer;">Cancel</button>
+            <button id="confirmCommitBtn" onclick="commitGame()" style="background:var(--success); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Confirm</button>
         </div>
     </div>
 </div>
@@ -75,8 +84,8 @@
     <div class="card">
         <h3>Loser Score (Manual/Deuce)</h3>
         <div style="display:flex; gap:10px; margin-bottom:15px;">
-            <input type="number" id="manualScoreInput" style="flex:1; padding:12px; border:1px solid #ddd; border-radius:8px;" placeholder="Loser score">
-            <button onclick="handleManualScore()" style="background:var(--secondary); color:white; border:none; padding:0 20px; border-radius:8px; font-weight:bold;">ADD</button>
+            <input type="number" id="manualScoreInput" style="flex:1; padding:12px; border:1px solid #ddd; border-radius:8px;" placeholder="Loser score (e.g. 13)">
+            <button onclick="handleManualScore()" style="background:var(--secondary); color:white; border:none; padding:0 20px; border-radius:8px; font-weight:bold; cursor:pointer;">ADD</button>
         </div>
         <h3>Standard Scores (0-11)</h3>
         <div id="scoreGrid" class="score-grid-container"></div>
@@ -93,7 +102,7 @@
         <h3>Archives</h3>
         <div style="display:flex; gap:10px; margin-bottom:15px;">
             <input type="text" id="archiveNameInput" placeholder="Archive Name" style="flex:1; padding:12px; border:1px solid #ddd; border-radius:8px;">
-            <button onclick="saveToArchive()" style="background:var(--primary); color:white; border:none; padding:0 15px; border-radius:8px; font-weight:bold;">Save</button>
+            <button onclick="saveToArchive()" style="background:var(--primary); color:white; border:none; padding:0 15px; border-radius:8px; font-weight:bold; cursor:pointer;">Save</button>
         </div>
         <div id="archiveList"></div>
     </div>
@@ -113,13 +122,13 @@
         <div id="masterListCheckboxes"></div>
         <div style="display:flex; gap:10px; margin-top:15px;">
             <input type="text" id="newPlayerName" style="flex:1; padding:12px; border:1px solid #ddd; border-radius:8px;" placeholder="Player Name">
-            <button onclick="addNewPlayer()" style="background:var(--primary); color:white; border:none; padding:0 20px; border-radius:8px; font-weight:bold;">Add</button>
+            <button onclick="addNewPlayer()" style="background:var(--primary); color:white; border:none; padding:0 20px; border-radius:8px; font-weight:bold; cursor:pointer;">Add</button>
         </div>
     </div>
     <div class="card">
         <label style="font-size:0.8rem; font-weight:bold">Base Bet (RM)</label>
         <input type="number" id="baseBetInput" onchange="updateRules()" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; margin:5px 0 15px 0;">
-        <button onclick="clearBoard()" style="width:100%; background:#ffebee; color:var(--danger); border:none; padding:15px; border-radius:8px; font-weight:bold;">RESET CURRENT SESSION</button>
+        <button onclick="clearBoard()" style="width:100%; background:#ffebee; color:var(--danger); border:none; padding:15px; border-radius:8px; font-weight:bold; cursor:pointer;">RESET CURRENT SESSION</button>
     </div>
 </div>
 
@@ -131,22 +140,43 @@
 </nav>
 
 <script>
-    /* CRITICAL: PASTE YOUR GOOGLE DEPLOYMENT URL HERE */
     const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwMeCUiALw27_yXy8Qtq8U_UPCuWKNLimgpHWC-Sf3vh13ahOUKuITAq_p__jjEOe-m/exec";
-    const STORAGE_KEY = 'acez_live_dashboard_v1';
+    const STORAGE_KEY = 'acez_live_dashboard_v2';
 
-    let appData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || { master: ["Acez"], today: ["Acez"], base: 10, active: { name: "New Session", history: [] }, archive: [], selections: { w1: null, w2: null, l1: null, l2: null }, activeSlot: 'w1' };
+    let appData;
+    try {
+        appData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || { master: ["Acez"], today: ["Acez"], base: 10, active: { name: "New Session", history: [] }, archive: [], selections: { w1: null, w2: null, l1: null, l2: null }, activeSlot: 'w1' };
+    } catch(e) {
+        appData = { master: ["Acez"], today: ["Acez"], base: 10, active: { name: "New Session", history: [] }, archive: [], selections: { w1: null, w2: null, l1: null, l2: null }, activeSlot: 'w1' };
+    }
+    
     let pendingGame = null;
 
     function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); render(); }
     function switchTab(id, el) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); document.getElementById('view-' + id).classList.add('active'); el.classList.add('active'); window.scrollTo(0,0); }
     function handleSlotClick(s) { appData.activeSlot = s; save(); }
-    function selectPlayer(name) { for(let k in appData.selections) if(appData.selections[k] === name) appData.selections[k] = null; appData.selections[appData.activeSlot] = name; const seq = {w1:'w2', w2:'l1', l1:'l2', l2:'w1'}; appData.activeSlot = seq[appData.activeSlot]; save(); }
+    
+    function selectPlayer(name) {
+        for(let k in appData.selections) if(appData.selections[k] === name) appData.selections[k] = null;
+        appData.selections[appData.activeSlot] = name;
+        const seq = {w1:'w2', w2:'l1', l1:'l2', l2:'w1'};
+        appData.activeSlot = seq[appData.activeSlot];
+        save();
+    }
 
     function openConfirm(score) {
         if(!appData.selections.w1 || !appData.selections.l1) return alert("Select Players First!");
+        
+        // AUTO-DEUCE (+2 to winner if score is 10 or higher)
         let winS = score >= 10 ? score + 2 : (document.getElementById('winScoreInput').value || 11);
-        let mult = (score == 0 ? 5 : (score == 1 ? 4 : (score <= 3 ? 3 : (score <= 6 ? 2 : 1))));
+        
+        // LOCKED MULTIPLIER: Score 1 = x4 multiplier
+        let mult = 1;
+        if (score == 0) mult = 5;
+        else if (score == 1) mult = 4;
+        else if (score <= 3) mult = 3;
+        else if (score <= 6) mult = 2;
+        
         pendingGame = { w: [appData.selections.w1, appData.selections.w2].filter(x=>x), l: [appData.selections.l1, appData.selections.l2].filter(x=>x), score: `${winS}-${score}`, payout: appData.base * mult };
         document.getElementById('confirmDetail').innerHTML = `<b>Win:</b> ${pendingGame.w.join('/')} (${winS})<br><b>Loss:</b> ${pendingGame.l.join('/')} (${score})<br><b>Payout:</b> RM ${pendingGame.payout}`;
         document.getElementById('confirmModal').style.display = 'flex';
@@ -155,9 +185,99 @@
     function handleManualScore() { const val = parseInt(document.getElementById('manualScoreInput').value); if(!isNaN(val)) { openConfirm(val); document.getElementById('manualScoreInput').value = ''; } }
     function closeConfirm() { document.getElementById('confirmModal').style.display = 'none'; }
     
-    /* UPDATED LOGIC: REAL-TIME GOOGLE SHEETS SYNC */
     function commitGame() {
         const btn = document.getElementById('confirmCommitBtn');
-        btn.innerText = "Syncing Cloud..."; btn.disabled = true;
+        btn.innerText = "Syncing..."; btn.disabled = true;
 
-        if (GOOGLE_SHEET_URL && GOOGLE_SHE
+        // FAILSAFE CLOUD SYNC: Won't crash buttons if script is wrong
+        if (GOOGLE_SHEET_URL && GOOGLE_SHEET_URL !== "PASTE_YOUR_WEB_APP_URL_HERE") {
+            try {
+                fetch(GOOGLE_SHEET_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        type: "ADD_MATCH",
+                        w: pendingGame.w,
+                        l: pendingGame.l,
+                        score: pendingGame.score,
+                        payout: pendingGame.payout,
+                        sessionName: appData.active.name
+                    })
+                }).catch(e => console.log("Cloud sync delayed. Storing locally."));
+            } catch(err) { console.log("Fetch failed safely."); }
+        }
+
+        appData.active.history.push(pendingGame);
+        appData.selections = { w1: null, w2: null, l1: null, l2: null }; appData.activeSlot = 'w1';
+        btn.innerText = "Confirm"; btn.disabled = false;
+        closeConfirm(); save();
+    }
+
+    function deleteGame(idx) { if(confirm("Delete match?")) { appData.active.history.splice(idx, 1); save(); } }
+    function saveToArchive() { const name = document.getElementById('archiveNameInput').value.trim(); if(!name) return alert("Enter name"); const session = JSON.parse(JSON.stringify(appData.active)); session.name = name; session.date = new Date().toLocaleDateString(); appData.archive.push(session); appData.active.history = []; appData.active.name = "New Session"; document.getElementById('archiveNameInput').value = ''; save(); alert("Archived!"); }
+    function loadArchive(idx) { if(confirm("Load session?")) { appData.active = JSON.parse(JSON.stringify(appData.archive[idx])); save(); switchTab('play', document.querySelector('.nav-item')); } }
+    function deleteArchive(idx) { if(confirm("Delete archive?")) { appData.archive.splice(idx, 1); save(); } }
+    function clearBoard() { if(confirm("Reset Board?")) { appData.active.history = []; save(); } }
+    function updateRules() { appData.base = parseInt(document.getElementById('baseBetInput').value) || 10; save(); }
+    
+    function addNewPlayer() { 
+        const n = document.getElementById('newPlayerName').value.trim(); 
+        if(n && !appData.master.includes(n)) { 
+            appData.master.push(n); appData.today.push(n); 
+            document.getElementById('newPlayerName').value=''; save(); 
+            
+            if (GOOGLE_SHEET_URL && GOOGLE_SHEET_URL !== "PASTE_YOUR_WEB_APP_URL_HERE") {
+                try {
+                    fetch(GOOGLE_SHEET_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ type: "SYNC_ROSTER", masterList: appData.master }) });
+                } catch(e) {}
+            }
+        } 
+    }
+    
+    function deleteMasterPlayer(n) { if(confirm(`Delete ${n}?`)) { appData.master = appData.master.filter(p=>p!==n); appData.today = appData.today.filter(p=>p!==n); save(); } }
+    function toggleToday(n) { if(appData.today.includes(n)) appData.today = appData.today.filter(x=>x!==n); else appData.today.push(n); save(); }
+
+    function getStats() {
+        let s = {}; appData.today.forEach(p=>s[p]={rm:0,w:0,l:0});
+        appData.active.history.forEach(g=>{
+            g.w.forEach(p=>{ if(s[p]) { s[p].rm += g.payout; s[p].w++; } });
+            g.l.forEach(p=>{ if(s[p]) { s[p].rm -= g.payout; s[p].l++; } });
+        });
+        return s;
+    }
+
+    function shareShortWhatsApp() { const s = getStats(); let t = `📌 *SESSION SUMMARY*\n🏆 *Session: ${appData.active.name}*\n\n`; Object.entries(s).sort((a,b)=>b[1].rm-a[1].rm).forEach(([n,v]) => { t += `${v.rm>=0?'🟢':'🔴'} *${n}*: RM ${v.rm} (${v.w}W-${v.l}L)\n`; }); window.open(`https://wa.me/?text=${encodeURIComponent(t)}`); }
+    function shareDetailedWhatsApp() { const s = getStats(); let m = `🎾 *Match List:*\n`; appData.active.history.forEach((g,i)=> m += `${i+1}. ${g.w.join('/')} def. ${g.l.join('/')} (${g.score})\n`); let t = `📝 *DETAILED REPORT*\n🏆 *Session: ${appData.active.name}*\n\n${m}\n📊 *Standings:*\n`; Object.entries(s).sort((a,b)=>b[1].rm-a[1].rm).forEach(([n,v]) => { t += `${v.rm>=0?'🟢':'🔴'} *${n}*: RM ${v.rm} (${v.w}W-${v.l}L)\n`; }); window.open(`https://wa.me/?text=${encodeURIComponent(t)}`); }
+
+    function render() {
+        document.getElementById('sessionNameHeader').innerText = appData.active.name;
+        document.getElementById('dateLine').innerText = new Date().toLocaleDateString();
+        document.getElementById('headerBaseDisplay').innerText = `RM${appData.base}`;
+        document.getElementById('baseBetInput').value = appData.base;
+        
+        ['w1','w2','l1','l2'].forEach(s => { const el = document.getElementById('slot-' + s); el.innerText = appData.selections[s] || 'Select'; el.className = 'slot' + (appData.activeSlot === s ? ' selected' : ''); });
+        
+        const ac = document.getElementById('activeChips'); ac.innerHTML = '';
+        appData.today.forEach(p => { const active = Object.values(appData.selections).includes(p); ac.innerHTML += `<div class="chip ${active?'active':''}" onclick="selectPlayer('${p}')">${p}</div>`; });
+        
+        const grid = document.getElementById('scoreGrid'); grid.innerHTML = '';
+        for(let i=0; i<=11; i++) {
+            let c="#fff", b="#ddd", t="#444";
+            if(i===0){c="#f3e5f5";b="#ce93d8";t="#6a1b9a";} 
+            else if(i===1){c="#e1f5fe";b="#81d4fa";t="#01579b";} 
+            else if(i<=3){c="#fff3e0";b="#ffcc80";t="#ef6c00";} 
+            else if(i<=6){c="#fffde7";b="#fff59d";t="#f9a825";}
+            let m = (i==0?5:(i==1?4:(i<=3?3:(i<=6?2:1))));
+            grid.innerHTML += `<div class="score-btn" style="background:${c}; border-color:${b}; color:${t}" onclick="openConfirm(${i})"><b>${i}</b><small>RM${appData.base * m}</small></div>`;
+        }
+        
+        const log = document.getElementById('currentLogList'); log.innerHTML = '';
+        appData.active.history.slice().reverse().forEach((g,i) => { log.innerHTML += `<div style="padding:12px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; font-size:0.85rem"><span><b>${g.w.join('/')}</b> vs ${g.l.join('/')} (${g.score})</span><i class="fas fa-trash" style="color:#ccc; cursor:pointer;" onclick="deleteGame(${appData.active.history.length-1-i})"></i></div>`; });
+        
+        const lb = document.querySelector('#leaderboardTable tbody'); lb.innerHTML = ''; 
+        const stats = getStats(); 
+        Object.entries(stats).sort((a,b)=>b[1].rm-a[1].rm).forEach(([n,v]) => { lb.innerHTML += `<tr><td>${n}<span class="win-badge">${v.w}W-${v.l}L</span></td><td style="text-align:right;" class="${v.rm >= 0 ? 'txt-win' : 'txt-lose'}">RM ${v.rm.toFixed(2)}</td></tr>`; });
+        
+        const al = document.getElementById('archiveList'); al.innerHTML = ''; appData.archive.slice().reverse().forEach((s, i) => { al.innerHTML += `<div style="padding:12px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;"><span>${s.name} <small style="color:#999">${s.date}</small></span><div><button onclick="loadArchive(${appData.archive.length-1-i})" style="padding:5px 10px; background:var(--secondary); color:white; border:none; border-radius:4px; font-size:0.7rem; cursor:pointer;">LOAD</button><button onclick="deleteArchive(${appData.archive.length-1-i})" style="background:none; border:none; color:var(--danger); margin-left:10px; cursor:pointer;"><i class="fas fa-trash"></i></button></div></div>`; });
+        const mc = document.getElementById('masterListCheckboxes'); mc.innerHTML = ''; appData.master.forEach(p => { mc.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee;"><span>${p}</span><div style="display:flex; align-items:center; gap:15px;"><i class="fas fa-trash-alt" style="color:#ccc; cursor:pointer;" onclick
