@@ -140,17 +140,19 @@
 </nav>
 
 <script>
-    const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwMeCUiALw27_yXy8Qtq8U_UPCuWKNLimgpHWC-Sf3vh13ahOUKuITAq_p__jjEOe-m/exec";
-    const STORAGE_KEY = 'acez_live_dashboard_v2';
+    /* LEAVE BLANK FOR INITIAL TEST TO VERIFY CLICKS WORK */
+    const GOOGLE_SHEET_URL = "";
+    const STORAGE_KEY = 'acez_fresh_start_v99';
 
-    let appData;
-    try {
-        appData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || { master: ["Acez"], today: ["Acez"], base: 10, active: { name: "New Session", history: [] }, archive: [], selections: { w1: null, w2: null, l1: null, l2: null }, activeSlot: 'w1' };
-    } catch(e) {
-        appData = { master: ["Acez"], today: ["Acez"], base: 10, active: { name: "New Session", history: [] }, archive: [], selections: { w1: null, w2: null, l1: null, l2: null }, activeSlot: 'w1' };
+    let appData = { master: ["Acez"], today: ["Acez"], base: 10, active: { name: "New Session", history: [] }, archive: [], selections: { w1: null, w2: null, l1: null, l2: null }, activeSlot: 'w1' };
+
+    function init() {
+        try {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) { appData = JSON.parse(saved); }
+        } catch(e) { console.log("Fresh initialization active."); }
+        render();
     }
-    
-    let pendingGame = null;
 
     function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); render(); }
     function switchTab(id, el) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); document.getElementById('view-' + id).classList.add('active'); el.classList.add('active'); window.scrollTo(0,0); }
@@ -166,17 +168,8 @@
 
     function openConfirm(score) {
         if(!appData.selections.w1 || !appData.selections.l1) return alert("Select Players First!");
-        
-        // AUTO-DEUCE (+2 to winner if score is 10 or higher)
         let winS = score >= 10 ? score + 2 : (document.getElementById('winScoreInput').value || 11);
-        
-        // LOCKED MULTIPLIER: Score 1 = x4 multiplier
-        let mult = 1;
-        if (score == 0) mult = 5;
-        else if (score == 1) mult = 4;
-        else if (score <= 3) mult = 3;
-        else if (score <= 6) mult = 2;
-        
+        let mult = (score == 0 ? 5 : (score == 1 ? 4 : (score <= 3 ? 3 : (score <= 6 ? 2 : 1))));
         pendingGame = { w: [appData.selections.w1, appData.selections.w2].filter(x=>x), l: [appData.selections.l1, appData.selections.l2].filter(x=>x), score: `${winS}-${score}`, payout: appData.base * mult };
         document.getElementById('confirmDetail').innerHTML = `<b>Win:</b> ${pendingGame.w.join('/')} (${winS})<br><b>Loss:</b> ${pendingGame.l.join('/')} (${score})<br><b>Payout:</b> RM ${pendingGame.payout}`;
         document.getElementById('confirmModal').style.display = 'flex';
@@ -189,8 +182,7 @@
         const btn = document.getElementById('confirmCommitBtn');
         btn.innerText = "Syncing..."; btn.disabled = true;
 
-        // FAILSAFE CLOUD SYNC: Won't crash buttons if script is wrong
-        if (GOOGLE_SHEET_URL && GOOGLE_SHEET_URL !== "PASTE_YOUR_WEB_APP_URL_HERE") {
+        if (GOOGLE_SHEET_URL) {
             try {
                 fetch(GOOGLE_SHEET_URL, {
                     method: "POST",
@@ -204,8 +196,8 @@
                         payout: pendingGame.payout,
                         sessionName: appData.active.name
                     })
-                }).catch(e => console.log("Cloud sync delayed. Storing locally."));
-            } catch(err) { console.log("Fetch failed safely."); }
+                }).catch(e => console.log("Sync skipped."));
+            } catch(err) { console.log("Sync handled."); }
         }
 
         appData.active.history.push(pendingGame);
@@ -226,11 +218,8 @@
         if(n && !appData.master.includes(n)) { 
             appData.master.push(n); appData.today.push(n); 
             document.getElementById('newPlayerName').value=''; save(); 
-            
-            if (GOOGLE_SHEET_URL && GOOGLE_SHEET_URL !== "PASTE_YOUR_WEB_APP_URL_HERE") {
-                try {
-                    fetch(GOOGLE_SHEET_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ type: "SYNC_ROSTER", masterList: appData.master }) });
-                } catch(e) {}
+            if (GOOGLE_SHEET_URL) {
+                try { fetch(GOOGLE_SHEET_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ type: "SYNC_ROSTER", masterList: appData.master }) }); } catch(e) {}
             }
         } 
     }
@@ -257,7 +246,6 @@
         document.getElementById('baseBetInput').value = appData.base;
         
         ['w1','w2','l1','l2'].forEach(s => { const el = document.getElementById('slot-' + s); el.innerText = appData.selections[s] || 'Select'; el.className = 'slot' + (appData.activeSlot === s ? ' selected' : ''); });
-        
         const ac = document.getElementById('activeChips'); ac.innerHTML = '';
         appData.today.forEach(p => { const active = Object.values(appData.selections).includes(p); ac.innerHTML += `<div class="chip ${active?'active':''}" onclick="selectPlayer('${p}')">${p}</div>`; });
         
@@ -275,9 +263,13 @@
         const log = document.getElementById('currentLogList'); log.innerHTML = '';
         appData.active.history.slice().reverse().forEach((g,i) => { log.innerHTML += `<div style="padding:12px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; font-size:0.85rem"><span><b>${g.w.join('/')}</b> vs ${g.l.join('/')} (${g.score})</span><i class="fas fa-trash" style="color:#ccc; cursor:pointer;" onclick="deleteGame(${appData.active.history.length-1-i})"></i></div>`; });
         
-        const lb = document.querySelector('#leaderboardTable tbody'); lb.innerHTML = ''; 
-        const stats = getStats(); 
-        Object.entries(stats).sort((a,b)=>b[1].rm-a[1].rm).forEach(([n,v]) => { lb.innerHTML += `<tr><td>${n}<span class="win-badge">${v.w}W-${v.l}L</span></td><td style="text-align:right;" class="${v.rm >= 0 ? 'txt-win' : 'txt-lose'}">RM ${v.rm.toFixed(2)}</td></tr>`; });
-        
+        const lb = document.querySelector('#leaderboardTable tbody'); lb.innerHTML = ''; const stats = getStats(); Object.entries(stats).sort((a,b)=>b[1].rm-a[1].rm).forEach(([n,v]) => { lb.innerHTML += `<tr><td>${n}<span class="win-badge">${v.w}W-${v.l}L</span></td><td style="text-align:right;" class="${v.rm >= 0 ? 'txt-win' : 'txt-lose'}">RM ${v.rm.toFixed(2)}</td></tr>`; });
         const al = document.getElementById('archiveList'); al.innerHTML = ''; appData.archive.slice().reverse().forEach((s, i) => { al.innerHTML += `<div style="padding:12px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;"><span>${s.name} <small style="color:#999">${s.date}</small></span><div><button onclick="loadArchive(${appData.archive.length-1-i})" style="padding:5px 10px; background:var(--secondary); color:white; border:none; border-radius:4px; font-size:0.7rem; cursor:pointer;">LOAD</button><button onclick="deleteArchive(${appData.archive.length-1-i})" style="background:none; border:none; color:var(--danger); margin-left:10px; cursor:pointer;"><i class="fas fa-trash"></i></button></div></div>`; });
-        const mc = document.getElementById('masterListCheckboxes'); mc.innerHTML = ''; appData.master.forEach(p => { mc.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee;"><span>${p}</span><div style="display:flex; align-items:center; gap:15px;"><i class="fas fa-trash-alt" style="color:#ccc; cursor:pointer;" onclick
+        const mc = document.getElementById('masterListCheckboxes'); mc.innerHTML = ''; appData.master.forEach(p => { mc.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee;"><span>${p}</span><div style="display:flex; align-items:center; gap:15px;"><i class="fas fa-trash-alt" style="color:#ccc; cursor:pointer;" onclick="deleteMasterPlayer('${p}')"></i><div onclick="toggleToday('${p}')" style="width:28px; height:28px; border-radius:50%; border:2px solid ${appData.today.includes(p)?'var(--success)':'#ddd'}; display:flex; align-items:center; justify-content:center; color:${appData.today.includes(p)?'var(--success)':'transparent'}; cursor:pointer;"><i class="fas fa-check"></i></div></div></div>`; });
+    }
+    
+    // Core Execution Initialization
+    init();
+</script>
+</body>
+</html>
