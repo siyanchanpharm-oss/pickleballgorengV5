@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#1a237e">
+    <title>Acez PB Goreng</title>
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/2075/2075253.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary: #1a237e; --secondary: #3949ab; --danger: #dc3545; --success: #28a745; --bg: #f8f9fa; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, sans-serif; margin: 0; background: var(--bg); padding-bottom: 100px; touch-action: manipulation; }
+        header { background: var(--primary); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; height: 65px; }
+        .base-indicator { background: var(--secondary); padding: 5px 12px; border-radius: 15px; font-size: 0.8rem; font-weight: bold; }
+        nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; border-top: 1px solid #eee; height: 75px; z-index: 1000; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #999; border: none; background: none; font-size: 0.7rem; cursor: pointer; }
+        .nav-item.active { color: var(--primary); font-weight: bold; }
+        .view { display: none; padding: 15px; width: 100%; }
+        .view.active { display: block; }
+        .card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); width: 100%; }
+        .header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .inline-score-box { border: 2px solid #2196F3; border-radius: 8px; width: 90px; height: 38px; text-align: center; font-weight: 900; color: #d32f2f; font-size: 1.3rem; background: #fff; }
+        .selection-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .slot { background: #f0f2f5; border: 1px dashed #cbd5e0; border-radius: 8px; padding: 12px 5px; text-align: center; font-size: 0.85rem; min-height: 45px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .slot.selected { background: #e8eaf6; border: 2px solid var(--secondary); color: var(--primary); font-weight: bold; }
+        .chip-container { display: flex; flex-wrap: wrap; gap: 8px; margin: 15px 0; }
+        .chip { background: white; border: 1px solid #ddd; padding: 8px 15px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; }
+        .chip.active { background: var(--secondary); color: white; border-color: var(--secondary); }
+        .score-grid-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .score-btn { border: 1px solid #ddd; border-radius: 10px; padding: 12px 0; display: flex; flex-direction: column; align-items: center; cursor: pointer; background: white; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 5000; align-items: center; justify-content: center; padding: 20px; }
+        .modal { background: white; width: 100%; max-width: 400px; border-radius: 16px; padding: 20px; text-align: center; }
+        .btn-wa { background:#25D366; color:white; border:none; padding:15px; border-radius:8px; width:100%; font-weight:bold; display:flex; align-items:center; justify-content:center; gap:8px; margin-top:10px; text-decoration: none; font-size: 0.9rem; }
+        table { width: 100%; border-collapse: collapse; }
+        td { padding: 12px 0; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+        .win-badge { background: #eee; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-left: 5px; font-weight: bold; }
+        .txt-win { color: var(--success); font-weight: bold; }
+        .txt-lose { color: var(--danger); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div><h2 id="sessionNameHeader" style="margin:0; font-size: 0.9rem;">Acez PB</h2><div id="dateLine" style="font-size: 0.7rem; opacity: 0.8;"></div></div>
+    <div id="headerBaseDisplay" class="base-indicator">RM10</div>
+</header>
+
+<div id="confirmModal" class="modal-overlay">
+    <div class="modal">
+        <h3 style="margin-top:0">Save Match?</h3>
+        <div id="confirmDetail" style="background:#f8f9fa; padding:15px; margin-bottom:20px; border-radius:8px; text-align:left; font-size: 0.9rem; line-height: 1.4;"></div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <button onclick="closeConfirm()" style="padding:15px; border:none; border-radius:8px; background:#eee; font-weight:bold;">Cancel</button>
+            <button id="confirmCommitBtn" onclick="commitGame()" style="background:var(--success); color:white; padding:15px; border:none; border-radius:8px; font-weight:bold;">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<div id="view-play" class="view active">
+    <div class="card selection-grid">
+        <div>
+            <div class="header-row"><h3 style="margin:0; font-size:0.8rem">Winners</h3><input type="number" id="winScoreInput" value="11" class="inline-score-box"></div>
+            <div id="slot-w1" class="slot" onclick="handleSlotClick('w1')">Select</div>
+            <div id="slot-w2" class="slot" onclick="handleSlotClick('w2')">Select</div>
+        </div>
+        <div>
+            <div class="header-row"><h3 style="margin:0; font-size:0.8rem">Losers</h3></div>
+            <div id="slot-l1" class="slot" onclick="handleSlotClick('l1')">Select</div>
+            <div id="slot-l2" class="slot" onclick="handleSlotClick('l2')">Select</div>
+        </div>
+    </div>
+    <div id="activeChips" class="chip-container"></div>
+    <div class="card">
+        <h3>Loser Score (Manual/Deuce)</h3>
+        <div style="display:flex; gap:10px; margin-bottom:15px;">
+            <input type="number" id="manualScoreInput" style="flex:1; padding:12px; border:1px solid #ddd; border-radius:8px;" placeholder="Loser score">
+            <button onclick="handleManualScore()" style="background:var(--secondary); color:white; border:none; padding:0 20px; border-radius:8px; font-weight:bold;">ADD</button>
+        </div>
+        <h3>Standard Scores (0-11)</h3>
+        <div id="scoreGrid" class="score-grid-container"></div>
+    </div>
+</div>
+
+<div id="view-logs" class="view">
+    <div class="card">
+        <h3>Session Log</h3>
+        <div id="currentLogList" style="max-height: 300px; overflow-y: auto; margin-bottom:15px; border:1px solid #f0f0f0; border-radius:8px;"></div>
+        <button onclick="shareDetailedWhatsApp()" class="btn-wa"><i class="fab fa-whatsapp"></i> Share Detailed Report</button>
+    </div>
+    <div class="card">
+        <h3>Archives</h3>
+        <div style="display:flex; gap:10px; margin-bottom:15px;">
+            <input type="text" id="archiveNameInput" placeholder="Archive Name" style="flex:1; padding:12px; border:1px solid #ddd; border-radius:8px;">
+            <button onclick="saveToArchive()" style="background:var(--primary); color:white; border:none; padding:0 15px; border-radius:8px; font-weight:bold;">Save</button>
+        </div>
+        <div id="archiveList"></div>
+    </div>
+</div>
+
+<div id="view-net" class="view">
+    <div class="card">
+        <h3>Leaderboard</h3>
+        <table id="leaderboardTable"><thead><tr><th>Player</th><th style="text-align:right">Net RM</th></tr></thead><tbody></tbody></table>
+        <button onclick="shareShortWhatsApp()" class="btn-wa"><i class="fab fa-whatsapp"></i> Share Summary Report</button>
+    </div>
+</div>
+
+<div id="view-roster" class="view">
+    <div class="card">
+        <h3>Roster</h3>
+        <div id="masterListCheckboxes"></div>
+        <div style="display:flex; gap:10px; margin-top:15px;">
+            <input type="text" id="newPlayerName" style="flex:1; padding:12px; border:1px solid #ddd; border-radius:8px;" placeholder="Player Name">
+            <button onclick="addNewPlayer()" style="background:var(--primary); color:white; border:none; padding:0 20px; border-radius:8px; font-weight:bold;">Add</button>
+        </div>
+    </div>
+    <div class="card">
+        <label style="font-size:0.8rem; font-weight:bold">Base Bet (RM)</label>
+        <input type="number" id="baseBetInput" onchange="updateRules()" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; margin:5px 0 15px 0;">
+        <button onclick="clearBoard()" style="width:100%; background:#ffebee; color:var(--danger); border:none; padding:15px; border-radius:8px; font-weight:bold;">RESET CURRENT SESSION</button>
+    </div>
+</div>
+
+<nav>
+    <div class="nav-item active" onclick="switchTab('play', this)"><i class="fas fa-trophy"></i><span>Play</span></div>
+    <div class="nav-item" onclick="switchTab('logs', this)"><i class="fas fa-folder-open"></i><span>Logs</span></div>
+    <div class="nav-item" onclick="switchTab('net', this)"><i class="fas fa-chart-line"></i><span>Net RM</span></div>
+    <div class="nav-item" onclick="switchTab('roster', this)"><i class="fas fa-users"></i><span>Roster</span></div>
+</nav>
+
+<script>
+    /* CRITICAL: PASTE YOUR GOOGLE DEPLOYMENT URL HERE */
+    const GOOGLE_SHEET_URL = "PASTE_YOUR_WEB_APP_URL_HERE";
+    const STORAGE_KEY = 'acez_live_dashboard_v1';
+
+    let appData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || { master: ["Acez"], today: ["Acez"], base: 10, active: { name: "New Session", history: [] }, archive: [], selections: { w1: null, w2: null, l1: null, l2: null }, activeSlot: 'w1' };
+    let pendingGame = null;
+
+    function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); render(); }
+    function switchTab(id, el) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); document.getElementById('view-' + id).classList.add('active'); el.classList.add('active'); window.scrollTo(0,0); }
+    function handleSlotClick(s) { appData.activeSlot = s; save(); }
+    function selectPlayer(name) { for(let k in appData.selections) if(appData.selections[k] === name) appData.selections[k] = null; appData.selections[appData.activeSlot] = name; const seq = {w1:'w2', w2:'l1', l1:'l2', l2:'w1'}; appData.activeSlot = seq[appData.activeSlot]; save(); }
+
+    function openConfirm(score) {
+        if(!appData.selections.w1 || !appData.selections.l1) return alert("Select Players First!");
+        let winS = score >= 10 ? score + 2 : (document.getElementById('winScoreInput').value || 11);
+        let mult = (score == 0 ? 5 : (score == 1 ? 4 : (score <= 3 ? 3 : (score <= 6 ? 2 : 1))));
+        pendingGame = { w: [appData.selections.w1, appData.selections.w2].filter(x=>x), l: [appData.selections.l1, appData.selections.l2].filter(x=>x), score: `${winS}-${score}`, payout: appData.base * mult };
+        document.getElementById('confirmDetail').innerHTML = `<b>Win:</b> ${pendingGame.w.join('/')} (${winS})<br><b>Loss:</b> ${pendingGame.l.join('/')} (${score})<br><b>Payout:</b> RM ${pendingGame.payout}`;
+        document.getElementById('confirmModal').style.display = 'flex';
+    }
+
+    function handleManualScore() { const val = parseInt(document.getElementById('manualScoreInput').value); if(!isNaN(val)) { openConfirm(val); document.getElementById('manualScoreInput').value = ''; } }
+    function closeConfirm() { document.getElementById('confirmModal').style.display = 'none'; }
+    
+    /* UPDATED LOGIC: REAL-TIME GOOGLE SHEETS SYNC */
+    function commitGame() {
+        const btn = document.getElementById('confirmCommitBtn');
+        btn.innerText = "Syncing Cloud..."; btn.disabled = true;
+
+        if (GOOGLE_SHEET_URL && GOOGLE_SHE
